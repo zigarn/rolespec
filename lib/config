@@ -9,12 +9,12 @@
 
 guess_distribution() {
   if [[ -r /usr/bin/yum ]]; then
-  echo centos
-elif [[ -r /usr/sbin/pacman ]]; then
-  echo arch
-else
-  echo debian
-fi
+    echo centos
+  elif [[ -r /usr/sbin/pacman ]]; then
+    echo arch
+  else
+    echo debian
+  fi
 }
 
 find_up () {

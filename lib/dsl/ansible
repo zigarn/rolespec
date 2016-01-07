@@ -12,9 +12,12 @@ install_ansible() {
 
     rolespec_run "Install Ansible - ${branch}"
 
-    if [[ -r "/etc/redhat-release" ]]; then
+    if [[ -r /usr/bin/yum ]]; then
       sudo yum install -y -q PyYAML python-jinja2 python-nose \
         python-crypto python-six
+    elif [[ -r /usr/sbin/pacman ]]; then
+      sudo pacman -S --noprogressbar --noconfirm python2 python2-yaml python2-jinja \
+        python2-nose python2-crypto python2-six
     else
       sudo apt-get install -yq python-yaml python-jinja2 python-nose \
         python-passlib python-crypto python-six
@@ -38,6 +41,11 @@ install_ansible() {
     fi
   fi
 
+  # Force python2 paths for Arch
+  if [[ -r /usr/sbin/pacman ]]; then
+    find "${ROLESPEC_ANSIBLE_INSTALL}"/{bin,plugins} -type f \
+      -exec sed -i 's|^#!/usr/bin/env python$|#!/usr/bin/python2|' "{}" \;
+  fi
   # Fix the paths for the Ansible binaries
   . "${ROLESPEC_ANSIBLE_INSTALL}/hacking/env-setup"
 
