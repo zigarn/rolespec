@@ -12,6 +12,8 @@ guess_distribution() {
     echo centos
   elif [[ -r /usr/sbin/pacman ]]; then
     echo arch
+  elif [[ -r /usr/bin/cygpath.exe ]]; then
+    echo cygwin
   else
     echo debian
   fi

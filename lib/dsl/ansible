@@ -18,6 +18,8 @@ install_ansible() {
     elif [[ -r /usr/sbin/pacman ]]; then
       sudo pacman -S --noprogressbar --noconfirm python2 python2-yaml python2-jinja \
         python2-nose python2-crypto python2-six
+    elif [[ -r /usr/bin/cygpath.exe ]]; then
+      true # Guess that ansible is already installed
     else
       sudo apt-get install -yq python-yaml python-jinja2 python-nose \
         python-passlib python-crypto python-six
@@ -45,6 +47,19 @@ install_ansible() {
   if [[ -r /usr/sbin/pacman ]]; then
     find "${ROLESPEC_ANSIBLE_INSTALL}"/{bin,plugins} -type f \
       -exec sed -i 's|^#!/usr/bin/env python$|#!/usr/bin/python2|' "{}" \;
+  elif [[ -r /usr/bin/cygpath.exe ]]; then
+    local fake_sudo="$(cat <<EOF
+#!/bin/bash
+while getopts :HSp:u: opt
+do
+  :
+done
+shift \$((OPTIND-1))  # throw out processed options and arguments
+exec "\$@"
+EOF
+    )"
+    echo "${fake_sudo}" > "${ROLESPEC_ANSIBLE_INSTALL}/bin/sudo"
+    chmod +x "${ROLESPEC_ANSIBLE_INSTALL}/bin/sudo"
   fi
   # Fix the paths for the Ansible binaries
   . "${ROLESPEC_ANSIBLE_INSTALL}/hacking/env-setup"

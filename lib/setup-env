@@ -76,6 +76,8 @@ update_system() {
     sudo yum update -q -y
   elif [[ -r /usr/sbin/pacman ]]; then
     sudo pacman -Syu --noprogressbar --noconfirm
+  elif [[ -r /usr/bin/cygpath.exe ]]; then
+    true # Do nothing
   else
     sudo apt-get -qq update
   fi
