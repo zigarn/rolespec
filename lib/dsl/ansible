@@ -8,7 +8,7 @@ install_ansible() {
   # Install Ansible
   if [[ -z "${ROLESPEC_TURBO_MODE}" ]]; then
     local branch="${1:-devel}"
-    local sha1="${2}"
+    local rev="${2:-$branch}"
 
     rolespec_run "Install Ansible - ${branch}"
 
@@ -20,22 +20,12 @@ install_ansible() {
         python-passlib python-crypto python-six
     fi
 
-    # Avoid a clone error from the directory already existing
+    # Avoid a problem from the directory already existing
     if [ -d "${ROLESPEC_ANSIBLE_INSTALL}" ]; then
       rm -rf "${ROLESPEC_ANSIBLE_INSTALL}"
     fi
 
-    if [ -z "${sha1}" ] ; then
-      git clone --depth 1 --recursive --branch "${branch}" \
-              "${ROLESPEC_ANSIBLE_SOURCE}" "${ROLESPEC_ANSIBLE_INSTALL}"
-    elif [ -n "${sha1}" ] ; then
-      git clone --recursive --branch "${branch}" \
-              "${ROLESPEC_ANSIBLE_SOURCE}" "${ROLESPEC_ANSIBLE_INSTALL}"
-      cd "${ROLESPEC_ANSIBLE_INSTALL}"
-      git checkout -f ${sha1}
-      git submodule update --init
-      cd - > /dev/null
-    fi
+    curl -skL "${ROLESPEC_ANSIBLE_SOURCE}/archive/${rev}.tar.gz" | tar --strip-components=1 -zxC "${ROLESPEC_ANSIBLE_INSTALL}"
   fi
 
   # Fix the paths for the Ansible binaries
